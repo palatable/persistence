@@ -6,23 +6,28 @@ sourceCompatibility = 1.8
 group = 'com.jnape.palatable'
 version = '1.0'
 
-idea {
-    module {
-        testSourceDirs += file('src/integrationTest/java')
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output
     }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom compile, testCompile
+    integrationTestRuntime.extendsFrom runtime, integrationTestCompile, testRuntime
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath += sourceSets.integrationTest.runtimeClasspath
 }
 
 repositories {
     mavenCentral()
-}
-
-sourceSets {
-    integrationTest
-}
-
-configurations {
-    testCompile.extendsFrom integrationTestCompile
-    testRuntime.extendsFrom integrationTestRuntime
 }
 
 dependencies {
@@ -38,4 +43,10 @@ dependencies {
 
     integrationTestCompile group: 'com.github.fakemongo', name: 'fongo', version: '1.4.3'
     integrationTestCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.1'
+}
+
+idea {
+    module {
+        scopes.TEST.plus += configurations.integrationTestCompile
+    }
 }
