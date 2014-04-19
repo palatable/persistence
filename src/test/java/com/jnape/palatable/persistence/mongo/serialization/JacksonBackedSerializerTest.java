@@ -11,14 +11,15 @@ import testsupport.fixture.Item;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
-public class BidirectionalJsonSerializerTest {
+public class JacksonBackedSerializerTest {
 
-    private BidirectionalJsonSerializer serializer;
+    private BidirectionalJsonSerializer<Item> serializer;
 
     @Before
     public void setUp() {
-        serializer = new BidirectionalJsonSerializer(new ObjectMapper());
+        serializer = new JacksonBackedSerializer<>(new ObjectMapper());
     }
 
     @Test
@@ -33,7 +34,8 @@ public class BidirectionalJsonSerializerTest {
     @SuppressWarnings("unchecked")
     @Test(expected = RuntimeException.class)
     public void throwsExceptionIfSerializationFails() throws JsonProcessingException {
-        serializer.serialize(Item.PROBLEM_CHILD);
+        Item problematicItem = mock(Item.class);
+        serializer.serialize(problematicItem);
     }
 
     @Test

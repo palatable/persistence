@@ -1,9 +1,7 @@
-package testsupport.fixture;
+package com.jnape.palatable.persistence.fixture;
 
-import testsupport.domain.Person;
-
-import static testsupport.domain.Person.female;
-import static testsupport.domain.Person.male;
+import static com.jnape.palatable.persistence.fixture.Person.female;
+import static com.jnape.palatable.persistence.fixture.Person.male;
 
 public class People {
     public static final Person ALICE   = female("Alice");

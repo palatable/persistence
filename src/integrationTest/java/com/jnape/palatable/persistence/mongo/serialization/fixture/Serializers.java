@@ -1,20 +1,19 @@
-package testsupport.fixture;
+package com.jnape.palatable.persistence.mongo.serialization.fixture;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import testsupport.domain.Gender;
-import testsupport.domain.Person;
+import com.jnape.palatable.persistence.fixture.Gender;
+import com.jnape.palatable.persistence.fixture.Person;
+import com.jnape.palatable.persistence.mongo.serialization.JacksonBackedSerializer;
 
 import java.io.IOException;
 
+public class Serializers {
 
-public class ObjectMappers {
-
-    public static ObjectMapper configuredForTestFixtures() {
+    public static <T> JacksonBackedSerializer<T> testJacksonSerializer() {
         Module testFixtures = new SimpleModule("Test Fixtures", Version.unknownVersion())
                 .addSerializer(Person.class, new JsonSerializer<Person>() {
                     @Override
@@ -29,7 +28,7 @@ public class ObjectMappers {
                 .addDeserializer(Person.class, new JsonDeserializer<Person>() {
                     @Override
                     public Person deserialize(JsonParser jsonParser,
-                                              DeserializationContext ctxt) throws IOException, JsonProcessingException {
+                                              DeserializationContext ctxt) throws IOException {
                         JsonNode jsonNode = jsonParser.getCodec().readTree(jsonParser);
                         String firstName = jsonNode.get("firstName").asText();
                         String gender = jsonNode.get("gender").asText();
@@ -37,8 +36,10 @@ public class ObjectMappers {
                     }
                 });
 
-        return new ObjectMapper()
+        ObjectMapper configuredObjectMapper = new ObjectMapper()
                 .registerModule(testFixtures)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        return new JacksonBackedSerializer<>(configuredObjectMapper);
     }
 }

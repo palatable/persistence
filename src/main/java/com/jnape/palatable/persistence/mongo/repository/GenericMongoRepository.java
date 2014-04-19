@@ -1,7 +1,6 @@
 package com.jnape.palatable.persistence.mongo.repository;
 
 import com.jnape.palatable.persistence.Entity;
-import com.jnape.palatable.persistence.mongo.query.MongoQuery;
 import com.jnape.palatable.persistence.mongo.serialization.BidirectionalJsonSerializer;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -17,23 +16,23 @@ import static java.util.stream.StreamSupport.stream;
 
 public abstract class GenericMongoRepository<Payload> implements MongoRepository<Payload, String> {
 
-    private final DBCollection                collection;
-    private final BidirectionalJsonSerializer serializer;
+    private final DBCollection                         collection;
+    private final BidirectionalJsonSerializer<Payload> serializer;
 
-    public GenericMongoRepository(DBCollection collection, BidirectionalJsonSerializer serializer) {
+    public GenericMongoRepository(DBCollection collection, BidirectionalJsonSerializer<Payload> serializer) {
         this.collection = collection;
         this.serializer = serializer;
     }
 
     @Override
-    public Optional<Entity<Payload, String>> findOne(MongoQuery mongoQuery) {
-        DBObject record = collection.findOne(mongoQuery.getCriteria());
+    public Optional<Entity<Payload, String>> findOne(DBObject query) {
+        DBObject record = collection.findOne(query);
         return Optional.ofNullable(record).map(this::toEntity);
     }
 
     @Override
-    public Iterable<Entity<Payload, String>> find(MongoQuery mongoQuery) {
-        DBCursor dbObjects = collection.find(mongoQuery.getCriteria());
+    public Iterable<Entity<Payload, String>> find(DBObject query) {
+        DBCursor dbObjects = collection.find(query);
         return () -> stream(dbObjects.spliterator(), false).map(this::toEntity).iterator();
     }
 

@@ -1,9 +1,9 @@
-package testsupport.domain;
+package com.jnape.palatable.persistence.fixture;
 
 import lombok.Value;
 
-import static testsupport.domain.Gender.FEMALE;
-import static testsupport.domain.Gender.MALE;
+import static com.jnape.palatable.persistence.fixture.Gender.FEMALE;
+import static com.jnape.palatable.persistence.fixture.Gender.MALE;
 
 @Value(staticConstructor = "person")
 public class Person {

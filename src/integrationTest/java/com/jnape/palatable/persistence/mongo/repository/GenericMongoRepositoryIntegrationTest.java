@@ -1,28 +1,22 @@
 package com.jnape.palatable.persistence.mongo.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fakemongo.junit.FongoRule;
 import com.jnape.palatable.persistence.Entity;
-import com.jnape.palatable.persistence.mongo.serialization.BidirectionalJsonSerializer;
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import com.jnape.palatable.persistence.fixture.Person;
+import com.mongodb.*;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import testsupport.domain.Person;
-import testsupport.fixture.ObjectMappers;
 
 import java.util.Optional;
 
 import static com.jnape.palatable.persistence.Entity.entity;
-import static com.jnape.palatable.persistence.mongo.query.MongoQuery.query;
+import static com.jnape.palatable.persistence.fixture.People.*;
+import static com.jnape.palatable.persistence.mongo.serialization.fixture.Serializers.testJacksonSerializer;
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static testsupport.fixture.People.*;
 import static testsupport.matchers.IsEntityCollectionContainingPayload.hasPayload;
 import static testsupport.matchers.IsEntityCollectionContainingPayload.hasPayloads;
 
@@ -37,8 +31,7 @@ public class GenericMongoRepositoryIntegrationTest {
     @Before
     public void setUp() {
         collection = fongoRule.newCollection();
-        ObjectMapper objectMapper = ObjectMappers.configuredForTestFixtures();
-        repository = new GenericMongoRepository<Person>(collection, new BidirectionalJsonSerializer(objectMapper)) {
+        repository = new GenericMongoRepository<Person>(collection, testJacksonSerializer()) {
         };
     }
 
@@ -72,12 +65,12 @@ public class GenericMongoRepositoryIntegrationTest {
         }});
 
         assertThat(
-                repository.findOne(query().eq("firstName", "David")),
+                repository.findOne(QueryBuilder.start("firstName").is("David").get()),
                 is(Optional.of(entity(DAVID, davidId.toString())))
         );
 
         assertThat(
-                repository.findOne(query().eq("firstName", "Chelsea")),
+                repository.findOne(QueryBuilder.start("firstName").is("Chelsea").get()),
                 is(Optional.of(entity(CHELSEA, chelseaId.toString())))
         );
     }
@@ -120,8 +113,8 @@ public class GenericMongoRepositoryIntegrationTest {
                         .get()
         ));
 
-        assertThat(repository.find(query().eq("gender", "FEMALE")), hasPayloads(ELEANOR, ALICE));
-        assertThat(repository.find(query().eq("gender", "MALE")), hasPayload(DAVID));
+        assertThat(repository.find(QueryBuilder.start("gender").is("FEMALE").get()), hasPayloads(ELEANOR, ALICE));
+        assertThat(repository.find(QueryBuilder.start("gender").is("MALE").get()), hasPayload(DAVID));
     }
 
     @Test
