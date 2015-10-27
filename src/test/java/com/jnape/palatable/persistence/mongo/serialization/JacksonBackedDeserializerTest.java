@@ -13,7 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class JacksonBackedSerializerTest {
+public class JacksonBackedDeserializerTest {
 
     private BidirectionalJsonSerializer<Item> serializer;
 

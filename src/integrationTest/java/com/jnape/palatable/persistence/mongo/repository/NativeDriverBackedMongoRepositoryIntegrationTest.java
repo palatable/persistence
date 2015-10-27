@@ -135,18 +135,18 @@ public class NativeDriverBackedMongoRepositoryIntegrationTest {
     @Test
     public void saveInsertsRecordAndReturnsEntityRepresentation() {
         Person alice = ALICE;
-        Entity<Person, String> entity = repository.save(alice);
+        Entity<Person, ObjectId> entity = repository.save(alice);
 
         DBObject savedRecord = collection.findOne();
         assertNotNull(savedRecord);
 
         assertThat(entity.get(), is(alice));
-        assertEquals(entity.id(), savedRecord.get("_id").toString());
+        assertEquals(entity.id(), savedRecord.get("_id"));
     }
 
     @Test
     public void saveUpdatesRecordWithEntityId() {
-        Entity<Person, String> ethan = repository.save(ETHAN);
+        Entity<Person, ObjectId> ethan = repository.save(ETHAN);
         DBObject record = collection.findOne();
         assertThat(record.get("firstName"), is("Ethan"));
         assertThat(record.get("gender"), is("MALE"));
@@ -161,7 +161,7 @@ public class NativeDriverBackedMongoRepositoryIntegrationTest {
 
     @Test
     public void saveInsertsNewRecordWithEntityIdIfNoPreviousRecordExists() {
-        String bobId = ObjectId.get().toString();
+        ObjectId bobId = ObjectId.get();
         repository.save(entity(BOB, bobId));
 
         assertThat(collection.findOne().get("_id"), is(bobId));

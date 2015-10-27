@@ -28,13 +28,12 @@ public class IsEntityCollectionContainingPayload<Payload, Id> extends IsCollecti
     }
 
     @SafeVarargs
-    @SuppressWarnings("Convert2Diamond")
     public static <Payload, Id> Matcher<Iterable<Entity<Payload, Id>>> hasPayloads(Payload... payloads) {
         List<Matcher<? super Iterable<Entity<Payload, Id>>>> all = new ArrayList<>();
         for (Payload payload : payloads)
             all.add(new IsEntityCollectionContainingPayload<>(payload));
 
-        return allOf(new IsIterableOfLengthMatcher<Payload, Id>(payloads), allOf(all));
+        return allOf(new IsIterableOfLengthMatcher<>(payloads), allOf(all));
     }
 
     public static <Payload, Id> IsEntityCollectionContainingPayload<Payload, Id> hasPayload(Payload payload) {
