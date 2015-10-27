@@ -3,7 +3,11 @@ package com.jnape.palatable.persistence.mongo.repository;
 import com.github.fakemongo.junit.FongoRule;
 import com.jnape.palatable.persistence.Entity;
 import com.jnape.palatable.persistence.fixture.Person;
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Rule;
@@ -12,27 +16,33 @@ import org.junit.Test;
 import java.util.Optional;
 
 import static com.jnape.palatable.persistence.Entity.entity;
-import static com.jnape.palatable.persistence.fixture.People.*;
+import static com.jnape.palatable.persistence.fixture.People.ALICE;
+import static com.jnape.palatable.persistence.fixture.People.BOB;
+import static com.jnape.palatable.persistence.fixture.People.CHELSEA;
+import static com.jnape.palatable.persistence.fixture.People.DAVID;
+import static com.jnape.palatable.persistence.fixture.People.ELEANOR;
+import static com.jnape.palatable.persistence.fixture.People.ETHAN;
 import static com.jnape.palatable.persistence.mongo.serialization.fixture.Serializers.testJacksonSerializer;
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static testsupport.matchers.IsEntityCollectionContainingPayload.hasPayload;
 import static testsupport.matchers.IsEntityCollectionContainingPayload.hasPayloads;
 
-public class GenericMongoRepositoryIntegrationTest {
+public class NativeDriverBackedMongoRepositoryIntegrationTest {
 
     @Rule public FongoRule fongoRule = new FongoRule();
 
     private DBCollection collection;
 
-    private GenericMongoRepository<Person> repository;
+    private NativeDriverBackedMongoRepository<Person> repository;
 
     @Before
     public void setUp() {
         collection = fongoRule.newCollection();
-        repository = new GenericMongoRepository<Person>(collection, testJacksonSerializer()) {
-        };
+        repository = new NativeDriverBackedMongoRepository<>(Person.class, collection, testJacksonSerializer());
     }
 
     @Test

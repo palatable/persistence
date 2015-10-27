@@ -8,31 +8,23 @@ import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import org.bson.types.ObjectId;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Optional;
 
 import static com.jnape.palatable.persistence.Entity.entity;
 import static java.util.stream.StreamSupport.stream;
 
-public abstract class GenericMongoRepository<Payload> implements MongoRepository<Payload, String> {
+public class NativeDriverBackedMongoRepository<Payload> implements MongoRepository<Payload, String> {
 
     private final Class<Payload>                       payloadClass;
     private final DBCollection                         collection;
     private final BidirectionalJsonSerializer<Payload> serializer;
 
-    public GenericMongoRepository(Class<Payload> payloadClass,
-                                  DBCollection collection,
-                                  BidirectionalJsonSerializer<Payload> serializer) {
+    public NativeDriverBackedMongoRepository(Class<Payload> payloadClass,
+                                             DBCollection collection,
+                                             BidirectionalJsonSerializer<Payload> serializer) {
         this.payloadClass = payloadClass;
         this.collection = collection;
         this.serializer = serializer;
-    }
-
-    public GenericMongoRepository(DBCollection collection, BidirectionalJsonSerializer<Payload> serializer) {
-        this.collection = collection;
-        this.serializer = serializer;
-        payloadClass = derivePayloadClass();
     }
 
     @Override
@@ -65,20 +57,5 @@ public abstract class GenericMongoRepository<Payload> implements MongoRepository
     protected final Entity<Payload, String> toEntity(DBObject dbObject) {
         Payload payload = serializer.deserialize(payloadClass, dbObject.toString());
         return entity(payload, dbObject.get("_id").toString());
-    }
-
-    @SuppressWarnings("unchecked")
-    private Class<Payload> derivePayloadClass() {
-        Type payloadType = ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments()[0];
-        if (payloadType instanceof Class)
-            return (Class<Payload>) payloadType;
-
-        throw new IllegalStateException(
-                "Could not derive concrete class from Payload type due to limitations with Java Generics; consider either:" +
-                        "\n" +
-                        "\t1) Calling the constructor with the concrete Payload class specified, or" +
-                        "\n" +
-                        "\t2) Substituting a concrete type for the Payload type argument in your Repository subclass"
-        );
     }
 }
