@@ -1,8 +1,5 @@
 package com.jnape.palatable.persistence;
 
-import lombok.ToString;
-
-@ToString
 public class Entity<Payload, Id> {
 
     private final Payload payload;
@@ -39,6 +36,14 @@ public class Entity<Payload, Id> {
         int result = payload.getClass().hashCode();
         result = 31 * result + id.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Entity{" +
+                "payload=" + payload +
+                ", id=" + id +
+                '}';
     }
 
     public static <Payload, Id> Entity<Payload, Id> entity(Payload payload, Id id) {
