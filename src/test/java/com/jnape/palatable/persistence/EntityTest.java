@@ -1,13 +1,11 @@
 package com.jnape.palatable.persistence;
 
-import com.jnape.palatable.persistence.fixture.Person;
 import org.junit.Test;
 import testsupport.fixture.Item;
 
 import java.util.UUID;
 
 import static com.jnape.palatable.persistence.Entity.entity;
-import static com.jnape.palatable.persistence.fixture.Person.female;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
@@ -46,10 +44,10 @@ public class EntityTest {
     @Test
     public void updateTransformsPayloadRetainingId() {
         String id = "id";
-        Entity<Person, String> karen = entity(female("Karen"), id);
-        Entity<Person, String> julie = karen.update(p -> female("Julie"));
+        Entity<Item, String> entity = entity(A, id);
+        Entity<Item, String> updated = entity.update(p -> B);
 
-        assertThat(julie.get().getFirstName(), is("Julie"));
-        assertThat(julie.id(), is(id));
+        assertThat(updated.get(), is(B));
+        assertThat(updated.id(), is(id));
     }
 }
