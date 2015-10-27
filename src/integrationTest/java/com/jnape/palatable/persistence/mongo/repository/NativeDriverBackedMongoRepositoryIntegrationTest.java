@@ -55,7 +55,7 @@ public class NativeDriverBackedMongoRepositoryIntegrationTest {
             put("gender", "MALE");
         }});
 
-        assertThat(repository.findOne(), is(Optional.of(entity(BOB, id.toString()))));
+        assertThat(repository.findOne(), is(Optional.of(entity(BOB, id))));
     }
 
     @Test
@@ -76,12 +76,12 @@ public class NativeDriverBackedMongoRepositoryIntegrationTest {
 
         assertThat(
                 repository.findOne(QueryBuilder.start("firstName").is("David").get()),
-                is(Optional.of(entity(DAVID, davidId.toString())))
+                is(Optional.of(entity(DAVID, davidId)))
         );
 
         assertThat(
                 repository.findOne(QueryBuilder.start("firstName").is("Chelsea").get()),
-                is(Optional.of(entity(CHELSEA, chelseaId.toString())))
+                is(Optional.of(entity(CHELSEA, chelseaId)))
         );
     }
 
