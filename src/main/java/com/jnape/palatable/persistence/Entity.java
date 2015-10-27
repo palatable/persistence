@@ -8,7 +8,7 @@ public class Entity<Payload, Id> {
     private final Payload payload;
     private final Id      id;
 
-    public Entity(Payload payload, Id id) {
+    private Entity(Payload payload, Id id) {
         this.payload = payload;
         this.id = id;
     }
