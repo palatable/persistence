@@ -1,6 +1,8 @@
 package com.jnape.palatable.persistence;
 
-public class Entity<Payload, Id> {
+import java.util.function.Function;
+
+public final class Entity<Payload, Id> {
 
     private final Payload payload;
     private final Id      id;
@@ -10,12 +12,16 @@ public class Entity<Payload, Id> {
         this.id = id;
     }
 
-    public final Payload get() {
+    public Payload get() {
         return payload;
     }
 
-    public final Id id() {
+    public Id id() {
         return id;
+    }
+
+    public <Update> Entity<Update, Id> update(Function<Payload, Update> fn) {
+        return entity(fn.apply(get()), id());
     }
 
     @Override
