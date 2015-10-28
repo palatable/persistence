@@ -1,11 +1,14 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'idea'
+apply plugin: 'signing'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = 1.8
 group = 'com.jnape.palatable'
 version = '1.0'
+description = "Persistent patterns that aren't antipatterns"
+ext.packaging = 'jar'
 
 sourceSets {
     integrationTest {
@@ -19,7 +22,7 @@ configurations {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
+    gradleVersion = '2.2.1'
 }
 
 task integrationTest(type: Test) {
@@ -49,5 +52,65 @@ dependencies {
 idea {
     module {
         scopes.TEST.plus += configurations.integrationTestCompile
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'Persistence'
+                packaging 'jar'
+                description 'Persistence patterns that aren\'t anti-patterns'
+                url 'http://github.com/palatable/persistence'
+
+                scm {
+                    url 'scm:git@github.com:palatable/persistence.git'
+                    connection 'scm:git@github.com:palatable/persistence.git'
+                    developerConnection 'scm:git@github.com:palatable/persistence.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'http://choosealicense.com/licenses/mit/'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'jnape'
+                        name 'John Napier'
+                    }
+                }
+            }
+        }
     }
 }
